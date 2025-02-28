@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"mgr/internal/config"
 	"mgr/internal/scanner"
-	"strings"
+	"mgr/internal/tui"
 
 	"github.com/spf13/cobra"
 )
@@ -19,10 +19,25 @@ func ScanCmd() *cobra.Command {
 				fmt.Println(config.Translate("root_not_set"))
 				return
 			}
+
 			scripts := scanner.ScanForScripts(rootPath)
-			for project, scriptList := range scripts {
-				fmt.Println(config.Translate("project"), project)
-				fmt.Println(config.Translate("available_scripts"), strings.Join(scriptList, ", "))
+			if len(scripts) == 0 {
+				fmt.Println("Nenhum script encontrado.")
+				return
+			}
+
+			if len(scripts) > 1 {
+				fmt.Println("Múltiplos projetos encontrados. Escolha um para visualizar os scripts:")
+				for projectPath := range scripts {
+					fmt.Println("- ", projectPath)
+				}
+				fmt.Println("Use 'mgr scan [projeto]' para ver scripts de um projeto específico.")
+				return
+			}
+
+			for projectPath, scriptList := range scripts {
+				tui.RunTUI(projectPath, scriptList)
+				break
 			}
 		},
 	}
