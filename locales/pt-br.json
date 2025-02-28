@@ -1,0 +1,12 @@
+{
+    "root": "Uma ferramenta CLI para gerenciar scripts globalmente",
+    "set_root_short": "Definir o diretório root",
+    "set_root_usage": "Uso: mr set-root [path]",
+    "root_path_set": "Diretório root definido para:",
+    "scan_short": "Escanear projetos e exibir scripts disponíveis",
+    "root_not_set": "Root path não definido. Use 'mr set-root [path]'",
+    "project": "Projeto:",
+    "available_scripts": "Scripts disponíveis:",
+    "language_set": "Idioma definido para:",
+    "suported_languages": "❌ Error || Linguagens suportadas: en, pt-br"
+}
