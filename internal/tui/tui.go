@@ -2,8 +2,8 @@ package tui
 
 import (
 	"fmt"
+	"mgr/internal/utils"
 	"os"
-	"os/exec"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -44,7 +44,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "enter":
 			m.selected = m.choices[m.cursor]
 			fmt.Println("\nRodando script:", m.selected)
-			runScript(m.projectPath, m.selected)
+			utils.RunScript(m.projectPath, m.selected)
 			return m, tea.Quit
 		}
 	}
@@ -72,12 +72,4 @@ func RunTUI(projectPath string, scripts []string) {
 		fmt.Println("Erro ao iniciar a interface:", err)
 		os.Exit(1)
 	}
-}
-
-func runScript(projectPath, script string) {
-	cmd := exec.Command("npm", "run", script)
-	cmd.Dir = projectPath
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	cmd.Run()
 }
