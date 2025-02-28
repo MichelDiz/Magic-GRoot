@@ -3,6 +3,7 @@ package scanner
 import (
 	"encoding/json"
 	"io/ioutil"
+	"mgr/internal/config"
 	"os"
 	"path/filepath"
 )
@@ -24,6 +25,7 @@ func ScanForScripts(root string) map[string][]string {
 					scriptList = append(scriptList, script)
 				}
 				scripts[path] = scriptList
+				config.SaveProjectToDB(path, scriptList)
 			}
 		}
 		return nil
