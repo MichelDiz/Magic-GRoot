@@ -2,6 +2,8 @@ package config
 
 import (
 	"database/sql"
+	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 
@@ -40,6 +42,15 @@ func InitDB() {
 	if err != nil {
 		panic(err)
 	}
+
+	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS projects (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		project_path TEXT UNIQUE,
+		scripts TEXT
+	)`)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func SetConfig(key, value string) {
@@ -60,4 +71,110 @@ func GetConfig(key string) string {
 		return ""
 	}
 	return value
+}
+
+func GetProjectsFromDB() map[string][]string {
+	projects := make(map[string][]string)
+
+	rows, err := db.Query("SELECT project_path, scripts FROM projects")
+	if err != nil {
+		fmt.Println("Erro ao recuperar projetos do banco:", err)
+		return projects
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var projectPath string
+		var scriptsJSON string
+
+		err := rows.Scan(&projectPath, &scriptsJSON)
+		if err != nil {
+			fmt.Println("Erro ao escanear linha:", err)
+			continue
+		}
+
+		var scripts []string
+		json.Unmarshal([]byte(scriptsJSON), &scripts)
+		projects[projectPath] = scripts
+	}
+
+	return projects
+}
+
+func SaveProjectToDB(projectPath string, scripts []string) {
+
+	scriptsJSON, err := json.Marshal(scripts)
+	if err != nil {
+		fmt.Println("Erro ao converter scripts para JSON:", err)
+		return
+	}
+
+	_, err = db.Exec(`INSERT INTO projects (project_path, scripts) 
+		VALUES (?, ?) 
+		ON CONFLICT(project_path) 
+		DO UPDATE SET scripts = excluded.scripts`,
+		projectPath, string(scriptsJSON))
+	if err != nil {
+		fmt.Println("Erro ao salvar projeto no banco de dados:", err)
+	}
+}
+
+func SetAlias(alias, projectPath string) {
+	_, err := db.Exec(`INSERT INTO aliases (alias, project_path) 
+		VALUES (?, ?) 
+		ON CONFLICT(alias) 
+		DO UPDATE SET project_path = excluded.project_path`,
+		alias, projectPath)
+	if err != nil {
+		log.Fatal("Erro ao salvar alias no banco de dados:", err)
+	}
+}
+
+func GetAlias(alias string) (string, error) {
+	var projectPath string
+	err := db.QueryRow("SELECT project_path FROM aliases WHERE alias = ?", alias).Scan(&projectPath)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return "", fmt.Errorf(" Alias '%s' não encontrado.", alias)
+		}
+		return "", err
+	}
+	return projectPath, nil
+}
+
+func GetAllAliases() map[string]string {
+	aliases := make(map[string]string)
+	rows, err := db.Query("SELECT alias, project_path FROM aliases")
+	if err != nil {
+		log.Fatal("Erro ao recuperar aliases:", err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var alias, projectPath string
+		err := rows.Scan(&alias, &projectPath)
+		if err != nil {
+			log.Fatal("Erro ao escanear alias:", err)
+		}
+		aliases[alias] = projectPath
+	}
+
+	return aliases
+}
+
+func GetScriptsFromDB(projectPath string) []string {
+	var scriptsJSON string
+	err := db.QueryRow("SELECT scripts FROM projects WHERE project_path = ?", projectPath).Scan(&scriptsJSON)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			fmt.Println(" Nenhum script encontrado para o projeto:", projectPath)
+			return nil
+		}
+		fmt.Println("Erro ao recuperar scripts do banco de dados:", err)
+		return nil
+	}
+
+	var scripts []string
+	json.Unmarshal([]byte(scriptsJSON), &scripts)
+	return scripts
 }
