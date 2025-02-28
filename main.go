@@ -18,6 +18,11 @@ func execute() {
 	RootCmd.AddCommand(cmd.ScanCmd())
 	RootCmd.AddCommand(cmd.SetRootCmd())
 	RootCmd.AddCommand(cmd.SetLangCmd())
+	RootCmd.AddCommand(cmd.ListCmd())
+	RootCmd.AddCommand(cmd.AliasCmd())
+	RootCmd.AddCommand(cmd.GoCmd())
+	RootCmd.AddCommand(cmd.SetRunnerCmd())
+
 	cobra.CheckErr(RootCmd.Execute())
 }
 
