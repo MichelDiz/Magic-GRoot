@@ -32,6 +32,10 @@ func RunSetRootTUI() {
 	runTUI(NewSetRootModel())
 }
 
+func RunAliasManagerTUI() {
+	runTUI(NewAliasManagerModel())
+}
+
 func clearScreen() {
 	cmd := exec.Command("clear") //! ver se funciona para todos OSes Unix/Linux/MacOS
 	cmd.Stdout = os.Stdout
