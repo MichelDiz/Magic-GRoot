@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"mgr/internal/config"
 	"mgr/internal/scanner"
@@ -20,7 +21,12 @@ func ScanCmd() *cobra.Command {
 				return
 			}
 
-			scripts := scanner.ScanForScripts(rootPath)
+			scripts, err := scanner.ScanForScripts(context.Background(), rootPath)
+			if err != nil {
+				fmt.Println("Erro ao buscar scripts:", err)
+				return
+			}
+
 			if len(scripts) == 0 {
 				fmt.Println("Nenhum script encontrado.")
 				return
