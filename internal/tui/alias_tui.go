@@ -13,6 +13,7 @@ type aliasModel struct {
 	selected  string
 	inputMode bool
 	aliasName string
+	quitting  bool
 }
 
 func NewAliasModel(projects []string) aliasModel {
@@ -71,7 +72,7 @@ func (m aliasModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m aliasModel) View() string {
 	if m.inputMode {
-		return fmt.Sprintf("\n Nome do alias: %s\n(Pressione Enter para confirmar)", m.aliasName)
+		return fmt.Sprintf("\n Digite um nome para o alias do projeto '%s':\n%s\n(Pressione Enter para confirmar)", m.selected, m.aliasName)
 	}
 	return RenderList("Escolha um projeto para criar um alias:", m.choices, m.cursor, m.quitting)
 }
