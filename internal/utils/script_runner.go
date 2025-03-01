@@ -30,7 +30,7 @@ func RunScript(projectPath, script string) {
 	cmd.Stderr = os.Stderr
 
 	if DryRun {
-		fmt.Printf(" (Dry-run) Executaria: cd %s && %s %s\n", projectPath, runner, strings.Join(cmdArgs, " "))
+		fmt.Printf(" (Dry-run) Would execute: cd %s && %s %s\n", projectPath, runner, strings.Join(cmdArgs, " "))
 		return
 	}
 

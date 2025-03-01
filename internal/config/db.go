@@ -15,14 +15,14 @@ var db *sql.DB
 func InitDB() {
 
 	if _, err := os.Stat("data"); os.IsNotExist(err) {
-		err = os.Mkdir("data", 0755)
+		err = os.Mkdir("data", constants.DirPermissions)
 		if err != nil {
 			log.Fatal("Erro ao criar diretório data/:", err)
 		}
 	}
 
 	var err error
-	db, err = sql.Open("sqlite3", "data/magic_groot.db")
+	db, err = sql.Open("sqlite3", constants.DBPath)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -54,11 +54,17 @@ func InitDB() {
 	}
 }
 
-func SetConfig(key, value string) {
-	_, err := db.Exec("INSERT INTO config (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value", key, value)
-	if err != nil {
-		log.Fatal(err)
+func SetConfig(key, value string) error {
+	if key == "" {
+		return fmt.Errorf("config key cannot be empty")
 	}
+
+	_, err := db.Exec("INSERT INTO config (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value",
+		key, value)
+	if err != nil {
+		return fmt.Errorf("failed to set config: %w", err)
+	}
+	return nil
 }
 
 func GetConfig(key string) string {
