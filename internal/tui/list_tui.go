@@ -1,6 +1,7 @@
 package tui
 
 import (
+	"context"
 	"fmt"
 	"mgr/internal/scanner"
 	"sort"
@@ -30,7 +31,11 @@ func (m listModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	cmd, handled := UpdateListHandler(msg, &m.cursor, m.choices, &m.quitting, nil, func(selected string) tea.Cmd {
 		clearScreen()
 		fmt.Println("\n Projeto selecionado:", selected)
-		scripts := scanner.ScanForScripts(selected)
+		scripts, err := scanner.ScanForScripts(context.Background(), selected)
+		if err != nil {
+			fmt.Println("\n Erro ao buscar scripts:", err)
+			return tea.Quit
+		}
 		if scriptList, exists := scripts[selected]; exists && len(scriptList) > 0 {
 			scriptArray := make([]string, 0, len(scriptList))
 			for script, command := range scriptList {
