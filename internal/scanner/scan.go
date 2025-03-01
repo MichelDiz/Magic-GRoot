@@ -2,34 +2,45 @@ package scanner
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"mgr/internal/config"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
-func ScanForScripts(root string) map[string][]string {
-	scripts := make(map[string][]string)
+type PackageJSON struct {
+	Name    string            `json:"name"`
+	Scripts map[string]string `json:"scripts"`
+}
 
-	filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+func ScanForScripts(rootPath string) map[string]map[string]string {
+	projects := make(map[string]map[string]string)
+	_ = filepath.Walk(rootPath, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
-			return nil
+			return err
 		}
+
+		if info.IsDir() && strings.HasSuffix(path, "node_modules") {
+			return filepath.SkipDir
+		}
+
 		if info.Name() == "package.json" {
-			file, _ := ioutil.ReadFile(path)
-			var data map[string]interface{}
-			json.Unmarshal(file, &data)
-			if scriptsMap, ok := data["scripts"].(map[string]interface{}); ok {
-				var scriptList []string
-				for script := range scriptsMap {
-					scriptList = append(scriptList, script)
-				}
-				scripts[path] = scriptList
-				config.SaveProjectToDB(path, scriptList)
+			packageData, err := os.ReadFile(path)
+			if err != nil {
+				return err
 			}
+
+			var pkg PackageJSON
+			if err := json.Unmarshal(packageData, &pkg); err != nil {
+				return err
+			}
+
+			projectPath := filepath.Dir(path)
+			projects[projectPath] = pkg.Scripts
+
+			config.SaveProjectToDB(projectPath, pkg.Name, pkg.Scripts)
 		}
 		return nil
 	})
-
-	return scripts
+	return projects
 }
