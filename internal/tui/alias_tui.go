@@ -73,16 +73,5 @@ func (m aliasModel) View() string {
 	if m.inputMode {
 		return fmt.Sprintf("\n Nome do alias: %s\n(Pressione Enter para confirmar)", m.aliasName)
 	}
-
-	s := "\n Escolha um projeto para criar um alias:\n\n"
-	for i, choice := range m.choices {
-		cursor := "  "
-		if m.cursor == i {
-			cursor = "=>"
-		}
-		s += fmt.Sprintf("%s %s\n", cursor, choice)
-	}
-
-	s += "\n Use as setas para navegar, Enter para selecionar, Q para sair."
-	return s
+	return RenderList("Escolha um projeto para criar um alias:", m.choices, m.cursor, m.quitting)
 }

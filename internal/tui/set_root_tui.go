@@ -14,6 +14,7 @@ type setRootModel struct {
 	selected    string
 	manualInput string
 	inputMode   bool
+	quitting    bool
 }
 
 func NewSetRootModel() setRootModel {
@@ -52,8 +53,12 @@ func (m setRootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 		switch msg.String() {
-		case "q":
+		case "q", "esc":
+			m.quitting = true
 			return m, tea.Quit
+		case "ctrl+c":
+			m.quitting = true
+			return m, tea.Interrupt
 		case "up":
 			if m.cursor > 0 {
 				m.cursor--
@@ -82,17 +87,7 @@ func (m setRootModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m setRootModel) View() string {
 	if m.inputMode {
-		return fmt.Sprintf("\n📝 Digite o caminho manualmente:\n%s\n(Pressione Enter para confirmar)", m.manualInput)
+		return fmt.Sprintf("\n Digite o caminho manualmente:\n%s\n(Pressione Enter para confirmar)", m.manualInput)
 	}
-
-	s := "\n Selecione o diretório root:\n\n"
-	for i, choice := range m.choices {
-		cursor := "  "
-		if m.cursor == i {
-			cursor = "=>"
-		}
-		s += fmt.Sprintf("%s %s\n", cursor, choice)
-	}
-	s += "\nUse as setas para navegar, Enter para selecionar, Q para sair."
-	return s
+	return RenderList("\n Selecione o diretório root:\n\n", m.choices, m.cursor, m.quitting)
 }

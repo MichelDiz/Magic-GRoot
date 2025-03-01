@@ -56,16 +56,5 @@ func (m listModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m listModel) View() string {
-	s := "\n Selecione um projeto:\n\n"
-
-	for i, choice := range m.choices {
-		cursor := "  "
-		if m.cursor == i {
-			cursor = "=>"
-		}
-		s += fmt.Sprintf("%s %s\n", cursor, choice)
-	}
-
-	s += "\n Use as setas para navegar, Enter para selecionar, Q para sair."
-	return s
+	return RenderList("Selecione um projeto:", m.choices, m.cursor, m.quitting)
 }

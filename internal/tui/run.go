@@ -33,7 +33,7 @@ func RunSetRootTUI() {
 }
 
 func clearScreen() {
-	cmd := exec.Command("clear") // Para Unix/Linux/MacOS
+	cmd := exec.Command("clear") //! ver se funciona para todos OSes Unix/Linux/MacOS
 	cmd.Stdout = os.Stdout
 	cmd.Run()
 }
