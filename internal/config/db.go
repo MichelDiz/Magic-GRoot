@@ -46,8 +46,9 @@ func InitDB() {
 	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS projects (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		project_path TEXT UNIQUE,
+		name TEXT,
 		scripts TEXT
-	)`)
+	) `)
 	if err != nil {
 		panic(err)
 	}
@@ -76,7 +77,7 @@ func GetConfig(key string) string {
 func GetProjectsFromDB() map[string][]string {
 	projects := make(map[string][]string)
 
-	rows, err := db.Query("SELECT project_path, scripts FROM projects")
+	rows, err := db.Query("SELECT project_path, name, scripts FROM projects")
 	if err != nil {
 		fmt.Println("Erro ao recuperar projetos do banco:", err)
 		return projects
@@ -85,35 +86,44 @@ func GetProjectsFromDB() map[string][]string {
 
 	for rows.Next() {
 		var projectPath string
+		var name string
 		var scriptsJSON string
 
-		err := rows.Scan(&projectPath, &scriptsJSON)
+		err := rows.Scan(&projectPath, &name, &scriptsJSON)
 		if err != nil {
 			fmt.Println("Erro ao escanear linha:", err)
 			continue
 		}
 
-		var scripts []string
-		json.Unmarshal([]byte(scriptsJSON), &scripts)
-		projects[projectPath] = scripts
+		var scripts map[string]string
+		if err := json.Unmarshal([]byte(scriptsJSON), &scripts); err != nil {
+			fmt.Println("Erro ao decodificar scripts JSON:", err)
+			continue
+		}
+
+		scriptList := make([]string, 0, len(scripts))
+		for script, command := range scripts {
+			scriptList = append(scriptList, fmt.Sprintf("%s: %s", script, command))
+		}
+
+		projects[projectPath] = append([]string{name}, scriptList...)
 	}
 
 	return projects
 }
 
-func SaveProjectToDB(projectPath string, scripts []string) {
-
+func SaveProjectToDB(projectPath, name string, scripts map[string]string) {
 	scriptsJSON, err := json.Marshal(scripts)
 	if err != nil {
 		fmt.Println("Erro ao converter scripts para JSON:", err)
 		return
 	}
 
-	_, err = db.Exec(`INSERT INTO projects (project_path, scripts) 
-		VALUES (?, ?) 
+	_, err = db.Exec(`INSERT INTO projects (project_path, name, scripts) 
+		VALUES (?, ?, ?) 
 		ON CONFLICT(project_path) 
-		DO UPDATE SET scripts = excluded.scripts`,
-		projectPath, string(scriptsJSON))
+		DO UPDATE SET name = excluded.name, scripts = excluded.scripts`,
+		projectPath, name, string(scriptsJSON))
 	if err != nil {
 		fmt.Println("Erro ao salvar projeto no banco de dados:", err)
 	}
