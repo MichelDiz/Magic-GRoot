@@ -6,6 +6,7 @@ require (
 	github.com/charmbracelet/bubbletea v1.3.4
 	github.com/mattn/go-sqlite3 v1.14.24
 	github.com/nicksnyder/go-i18n/v2 v2.5.1
+	github.com/olekukonko/tablewriter v0.0.5
 	github.com/spf13/cobra v1.9.1
 	golang.org/x/text v0.21.0
 )
