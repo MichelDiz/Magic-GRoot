@@ -8,5 +8,7 @@
     "project": "Projeto:",
     "available_scripts": "Scripts disponíveis:",
     "language_set": "Idioma definido para:",
-    "suported_languages": "❌ Error || Linguagens suportadas: en, pt-br"
+    "suported_languages": "❌ Error || Linguagens suportadas: en, pt-br",
+    "ErrNoProjects": "Nenhum projeto encontrado no banco de dados",
+    "ErrNoScripts": "Nenhum script encontrado para este projeto"
 }
