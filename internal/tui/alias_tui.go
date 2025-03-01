@@ -3,7 +3,6 @@ package tui
 import (
 	"fmt"
 	"mgr/internal/config"
-	"os"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -62,6 +61,7 @@ func (m aliasModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		case "enter":
 			m.selected = m.choices[m.cursor]
+			clearScreen()
 			fmt.Printf("\n Digite um nome para o alias do projeto '%s': ", m.selected)
 			m.inputMode = true
 		}
@@ -78,19 +78,11 @@ func (m aliasModel) View() string {
 	for i, choice := range m.choices {
 		cursor := "  "
 		if m.cursor == i {
-			cursor = "👉"
+			cursor = "=>"
 		}
 		s += fmt.Sprintf("%s %s\n", cursor, choice)
 	}
 
 	s += "\n Use as setas para navegar, Enter para selecionar, Q para sair."
 	return s
-}
-
-func RunAliasTUI(projects []string) {
-	p := tea.NewProgram(NewAliasModel(projects))
-	if err := p.Start(); err != nil {
-		fmt.Println("Erro ao iniciar a interface:", err)
-		os.Exit(1)
-	}
 }
