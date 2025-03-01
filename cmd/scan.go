@@ -35,7 +35,11 @@ func ScanCmd() *cobra.Command {
 				return
 			}
 
-			for projectPath, scriptList := range scripts {
+			for projectPath, scriptMap := range scripts {
+				scriptList := make([]string, 0, len(scriptMap))
+				for script, command := range scriptMap {
+					scriptList = append(scriptList, fmt.Sprintf("%s: %s", script, command))
+				}
 				tui.RunTUI(projectPath, scriptList)
 				break
 			}
