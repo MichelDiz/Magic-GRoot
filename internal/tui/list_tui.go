@@ -69,11 +69,3 @@ func (m listModel) View() string {
 	s += "\n Use as setas para navegar, Enter para selecionar, Q para sair."
 	return s
 }
-
-func RunListTUI(projects []string) {
-	p := tea.NewProgram(NewListModel(projects))
-	if err := p.Start(); err != nil {
-		fmt.Println("Erro ao iniciar a interface:", err)
-		os.Exit(1)
-	}
-}

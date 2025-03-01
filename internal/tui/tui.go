@@ -65,11 +65,3 @@ func (m model) View() string {
 	s += "\nPressione ↑/↓ para navegar, Enter para executar, Q para sair."
 	return s
 }
-
-func RunTUI(projectPath string, scripts []string) {
-	p := tea.NewProgram(NewModel(projectPath, scripts))
-	if err := p.Start(); err != nil {
-		fmt.Println("Erro ao iniciar a interface:", err)
-		os.Exit(1)
-	}
-}

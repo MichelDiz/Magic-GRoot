@@ -96,11 +96,3 @@ func (m setRootModel) View() string {
 	s += "\nUse as setas para navegar, Enter para selecionar, Q para sair."
 	return s
 }
-
-func RunSetRootTUI() {
-	p := tea.NewProgram(NewSetRootModel())
-	if err := p.Start(); err != nil {
-		fmt.Println("Erro ao iniciar a interface:", err)
-		os.Exit(1)
-	}
-}
