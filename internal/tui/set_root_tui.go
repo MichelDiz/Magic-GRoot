@@ -89,5 +89,5 @@ func (m setRootModel) View() string {
 	if m.inputMode {
 		return fmt.Sprintf("\n Digite o caminho manualmente:\n%s\n(Pressione Enter para confirmar)", m.manualInput)
 	}
-	return RenderList("\n Selecione o diretório root:\n\n", m.choices, m.cursor)
+	return RenderList("\n Selecione o diretório root:\n\n", m.choices, m.cursor, m.quitting)
 }

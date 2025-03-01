@@ -52,5 +52,5 @@ func (m listModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m listModel) View() string {
-	return RenderList("Selecione um projeto:", m.choices, m.cursor)
+	return RenderList("Selecione um projeto:", m.choices, m.cursor, m.quitting)
 }
