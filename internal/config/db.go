@@ -188,3 +188,10 @@ func GetScriptsFromDB(projectPath string) []string {
 	json.Unmarshal([]byte(scriptsJSON), &scripts)
 	return scripts
 }
+
+func DeleteAlias(alias string) {
+	_, err := db.Exec("DELETE FROM aliases WHERE alias = ?", alias)
+	if err != nil {
+		log.Fatal("Erro ao excluir alias do banco de dados:", err)
+	}
+}
